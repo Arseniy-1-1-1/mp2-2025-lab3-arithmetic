@@ -28,12 +28,17 @@ TEST(StackTests, Size) {
     EXPECT_EQ(st.size(), 3);
 }
 
-TEST(StackTests, Clear) {
+TEST(StackTests, ClearEmpty) {
     Stack<int> st;
     st.push(1);
-    st.push(2);
     st.clear();
     EXPECT_TRUE(st.empty());
+}
+
+TEST(StackTests, ClearSize) {
+    Stack<int> st;
+    st.push(1);
+    st.clear();
     EXPECT_EQ(st.size(), 0);
 }
 
@@ -47,14 +52,25 @@ TEST(StackTests, PopOnEmptyThrows) {
     EXPECT_THROW(st.pop(), std::runtime_error);
 }
 
-TEST(StackTests, AutoResize) {
+TEST(StackTests, AutoResizeNoThrow) {
     Stack<int> st(2);
     st.push(1);
     st.push(2);
-
-    // переполнение → должно увеличить capacity
     EXPECT_NO_THROW(st.push(3));
+}
 
+TEST(StackTests, AutoResizeSize) {
+    Stack<int> st(2);
+    st.push(1);
+    st.push(2);
+    st.push(3);
     EXPECT_EQ(st.size(), 3);
+}
+
+TEST(StackTests, AutoResizeTop) {
+    Stack<int> st(2);
+    st.push(1);
+    st.push(2);
+    st.push(3);
     EXPECT_EQ(st.top(), 3);
 }

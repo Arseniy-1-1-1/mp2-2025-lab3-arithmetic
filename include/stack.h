@@ -35,6 +35,7 @@ public:
 
     ~Stack() {
         delete[] data;
+        data = nullptr;
     }
 
     void push(const T& value) {

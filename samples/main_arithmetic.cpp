@@ -1,6 +1,8 @@
 // реализация пользовательского приложения
 #include <iostream>
 #include <string>
+#include <map>
+#include <cctype>
 #include "arithmetic.h"
 
 int main() {
@@ -9,15 +11,24 @@ int main() {
     std::getline(std::cin, expr);
 
     try {
-        // Преобразование в ОПЗ
         auto rpn = toRPN(expr);
 
         std::cout << "\nOPZ: ";
         for (const auto& token : rpn)
             std::cout << token << " ";
+        std::cout << std::endl;
+        std::map<char, double> variables;
 
-        // Вычисление
-        double result = evalRPN(rpn);
+        for (const auto& token : rpn) {
+            if (token.size() == 1 && std::isalpha(token[0])) {
+                char v = token[0];
+                if (!variables.count(v)) {
+                    std::cout << "Vvedite znachenie " << v << ": ";
+                    std::cin >> variables[v];
+                }
+            }
+        }
+        double result = evalRPN(rpn, variables);
 
         std::cout << "\nRes: " << result << std::endl;
     }

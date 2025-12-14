@@ -3,6 +3,10 @@
 #include "stack.h"
 #include <cctype>
 #include <stdexcept>
+#include <iostream>
+#include <map>
+
+using namespace std;
 
 bool isOperator(char c) {
     return c == '+' || c == '-' || c == '*' || c == '/';
@@ -14,16 +18,14 @@ int precedence(char op) {
     return 0;
 }
 
-// -------------------- INFIX → RPN --------------------
-std::vector<std::string> toRPN(const std::string& expr) {
+std::vector<string> toRPN(const string& expr) {
     Stack<char> ops;
-    std::vector<std::string> output;
+    vector<string> output;
 
     for (size_t i = 0; i < expr.size(); i++) {
         char c = expr[i];
         if (c == ' ') continue;
 
-        // Число
         if (isdigit(c)) {
             std::string num;
             while (i < expr.size() && isdigit(expr[i])) {
@@ -38,16 +40,19 @@ std::vector<std::string> toRPN(const std::string& expr) {
         }
         else if (c == ')') {
             while (!ops.empty() && ops.top() != '(') {
-                output.push_back(std::string(1, ops.top()));
+                output.push_back(string(1, ops.top()));
                 ops.pop();
             }
-            ops.pop(); // удалить '('
+            ops.pop();
+        }
+        else if (isalpha(c)) {
+            output.push_back(string(1, c));
         }
         else if (isOperator(c)) {
             while (!ops.empty() && isOperator(ops.top()) &&
                 precedence(ops.top()) >= precedence(c))
             {
-                output.push_back(std::string(1, ops.top()));
+                output.push_back(string(1, ops.top()));
                 ops.pop();
             }
             ops.push(c);
@@ -58,27 +63,25 @@ std::vector<std::string> toRPN(const std::string& expr) {
     }
 
     while (!ops.empty()) {
-        output.push_back(std::string(1, ops.top()));
+        output.push_back(string(1, ops.top()));
         ops.pop();
     }
 
     return output;
 }
 
-// -------------------- EVAL RPN --------------------
-double evalRPN(const std::vector<std::string>& rpn) {
+double evalRPN(const vector<std::string>& rpn, const std::map<char, double>& variables) {
     Stack<double> st;
 
     for (const auto& token : rpn) {
         if (token.size() == 1 && isOperator(token[0])) {
             if (st.size() < 2)
-                throw std::runtime_error("invalid expression");
+                throw runtime_error("invalid expression");
 
             double b = st.top(); st.pop();
             double a = st.top(); st.pop();
-            char op = token[0];
 
-            switch (op) {
+            switch (token[0]) {
             case '+': st.push(a + b); break;
             case '-': st.push(a - b); break;
             case '*': st.push(a * b); break;
@@ -88,6 +91,12 @@ double evalRPN(const std::vector<std::string>& rpn) {
                 break;
             }
         }
+        else if (token.size() == 1 && isalpha(token[0])) {
+            char var = token[0];
+            if (!variables.count(var))
+                throw std::runtime_error("unknown variable");
+            st.push(variables.at(var));
+        }
         else {
             st.push(std::stod(token));
         }
@@ -96,8 +105,17 @@ double evalRPN(const std::vector<std::string>& rpn) {
     return st.top();
 }
 
-// -------------------- FULL EVALUATION --------------------
 double evaluateExpression(const std::string& expr) {
     auto rpn = toRPN(expr);
-    return evalRPN(rpn);
+    map<char, double> variables;
+    for (const auto& token : rpn) {
+        if (token.size() == 1 && isalpha(token[0])) {
+            char v = token[0];
+            if (!variables.count(v)) {
+                cout << "Введите значение " << v << ": ";
+                cin >> variables[v];
+            }
+        }
+    }
+    return evalRPN(rpn, variables);
 }

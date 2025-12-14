@@ -2,15 +2,13 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <map>
 
 bool isOperator(char c);
 int precedence(char op);
 
-// Преобразование инфиксной записи в польскую (ОПЗ)
 std::vector<std::string> toRPN(const std::string& expr);
 
-// Вычисление польской записи
-double evalRPN(const std::vector<std::string>& rpn);
+double evalRPN(const std::vector<std::string>& rpn, const std::map<char, double>& variables);
 
-// Главная функция
 double evaluateExpression(const std::string& expr);
