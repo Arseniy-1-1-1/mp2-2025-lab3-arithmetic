@@ -19,6 +19,7 @@ int precedence(char op) {
 }
 
 std::vector<string> toRPN(const string& expr) {
+    int balance = 0;
     Stack<char> ops;
     vector<string> output;
 
@@ -29,24 +30,27 @@ std::vector<string> toRPN(const string& expr) {
         if (isdigit(c)) {
             std::string num;
             while (i < expr.size() && isdigit(expr[i])) {
-                num += expr[i];
-                i++;
+                num += expr[i++];
             }
             i--;
             output.push_back(num);
         }
+        else if (isalpha(c)) {
+            output.push_back(std::string(1, c));
+        }
         else if (c == '(') {
+            balance++;
             ops.push(c);
         }
         else if (c == ')') {
+            if (balance == 0)
+                throw std::runtime_error("Extra ')'");
+            balance--;
             while (!ops.empty() && ops.top() != '(') {
                 output.push_back(string(1, ops.top()));
                 ops.pop();
             }
             ops.pop();
-        }
-        else if (isalpha(c)) {
-            output.push_back(string(1, c));
         }
         else if (isOperator(c)) {
             while (!ops.empty() && isOperator(ops.top()) &&
@@ -67,6 +71,9 @@ std::vector<string> toRPN(const string& expr) {
         ops.pop();
     }
 
+    if (balance != 0)
+        throw std::runtime_error("Missing ')'");
+
     return output;
 }
 
@@ -86,7 +93,7 @@ double evalRPN(const vector<std::string>& rpn, const std::map<char, double>& var
             case '-': st.push(a - b); break;
             case '*': st.push(a * b); break;
             case '/':
-                if (b == 0) throw std::runtime_error("division by zero");
+                if (b == 0) throw runtime_error("division by zero");
                 st.push(a / b);
                 break;
             }
@@ -108,6 +115,7 @@ double evalRPN(const vector<std::string>& rpn, const std::map<char, double>& var
 double evaluateExpression(const std::string& expr) {
     auto rpn = toRPN(expr);
     map<char, double> variables;
+
     for (const auto& token : rpn) {
         if (token.size() == 1 && isalpha(token[0])) {
             char v = token[0];

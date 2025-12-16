@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <stdexcept>
+
 
 bool isOperator(char c);
 int precedence(char op);
