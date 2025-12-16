@@ -36,3 +36,11 @@ TEST(ArithmeticTests, MultiDigitNumbers) {
 TEST(ArithmeticTests, NestedBrackets) {
     EXPECT_DOUBLE_EQ(evaluateExpression("(2+(3*4))*2"), 28);
 }
+
+TEST(ArithmeticTests, ExtraBracket) {
+    EXPECT_THROW(evaluateExpression("20+15-2)"), std::runtime_error);
+}
+
+TEST(ArithmeticTests, MissingBracket) {
+    EXPECT_THROW(evaluateExpression("(20+15-2"), std::runtime_error);
+}

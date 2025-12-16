@@ -18,33 +18,37 @@ int precedence(char op) {
     return 0;
 }
 
-std::vector<string> toRPN(const string& expr) {
+vector<string> toRPN(const string& expr) {
     int balance = 0;
     Stack<char> ops;
     vector<string> output;
 
     for (size_t i = 0; i < expr.size(); i++) {
         char c = expr[i];
+
         if (c == ' ') continue;
 
         if (isdigit(c)) {
-            std::string num;
+            string num;
             while (i < expr.size() && isdigit(expr[i])) {
                 num += expr[i++];
             }
             i--;
             output.push_back(num);
         }
+
         else if (isalpha(c)) {
-            output.push_back(std::string(1, c));
+            output.push_back(string(1, c));
         }
+
         else if (c == '(') {
             balance++;
             ops.push(c);
         }
+
         else if (c == ')') {
             if (balance == 0)
-                throw std::runtime_error("Extra ')'");
+                throw runtime_error("Extra ')'");
             balance--;
             while (!ops.empty() && ops.top() != '(') {
                 output.push_back(string(1, ops.top()));
@@ -52,6 +56,7 @@ std::vector<string> toRPN(const string& expr) {
             }
             ops.pop();
         }
+
         else if (isOperator(c)) {
             while (!ops.empty() && isOperator(ops.top()) &&
                 precedence(ops.top()) >= precedence(c))
@@ -61,6 +66,7 @@ std::vector<string> toRPN(const string& expr) {
             }
             ops.push(c);
         }
+
         else {
             throw std::runtime_error("invalid character");
         }
@@ -105,7 +111,7 @@ double evalRPN(const vector<std::string>& rpn, const std::map<char, double>& var
             st.push(variables.at(var));
         }
         else {
-            st.push(std::stod(token));
+            st.push(stod(token));
         }
     }
 
